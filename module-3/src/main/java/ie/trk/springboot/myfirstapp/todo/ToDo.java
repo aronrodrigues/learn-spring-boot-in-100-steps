@@ -2,16 +2,25 @@ package ie.trk.springboot.myfirstapp.todo;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Size;
 
+@Entity
 public class ToDo {
 
+    @Id
+    @GeneratedValue
     private int id;
     private String username;
     @Size(min = 10, message = "Enter at least 10 characters")
     private String description;
     private LocalDate targetDate;
     private boolean done;
+
+    public ToDo() {
+    }
 
     public ToDo(int id, String username, String description, LocalDate targetDate, boolean done) {
         super();

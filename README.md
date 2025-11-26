@@ -112,7 +112,9 @@ https://central.sonatype.com/artifact/javax.servlet/jstl
   * spring.datasource.url=jdbc:h2:mem:testdb (updates random default)
 
 # Spring JPA
-* 
+* ```ToDoJpaRepo extends JpaRepository<ToDo, Integer> {```
+* spring.jpa.defer-datasource-initialization=true
+* spring.jpa.show-sql=true
 
 # Spring security
 

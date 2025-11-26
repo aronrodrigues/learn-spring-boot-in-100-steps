@@ -1,8 +1,11 @@
 package ie.trk.springboot.myfirstapp.todo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -10,38 +13,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import jakarta.validation.Valid;
 
 @Controller
-@SessionAttributes("name")
 @RequestMapping("/todos")
-public class ToDoController {
+public class ToDoControllerJPA {
 
     private final ToDoService toDoService;
+    private final ToDoRepository toDoRepository;
 
     @Value("${spring.mvc.format.date}")
     private String dateFormat;
 
-    public ToDoController(ToDoService toDoService) {
+    public ToDoControllerJPA(ToDoService toDoService, ToDoRepository toDoRepository) {
+        super();
         this.toDoService = toDoService;
+        this.toDoRepository = toDoRepository;
     }
 
     @GetMapping("/")
     public String showListToDoPage(ModelMap model) {
-        List<ToDo> todos = toDoService.findByUsername("aron");
+
+        List<ToDo> todos = toDoRepository.findByUsername(getUsername());
         model.put("todos", todos);
-        /*
-        model.put(
-            "todos", 
-            todos.stream().map(
-                t -> Map.of(
-                    "id", t.getId(), 
-                    "description", t.getDescription()
-                )
-            ).collect(Collectors.toList()));
-         */
         return "listTodos";
     }
 
@@ -58,37 +53,48 @@ public class ToDoController {
         if (bindingResult.hasErrors()) {
             return "addTodo";
         }
-        String username = model.get("name").toString();
-        toDoService.createToDo(username, toDo.getDescription());
+        toDo.setUsername(getUsername());
+        toDoRepository.save(toDo);
         return "redirect:/todos/";
     }
 
     @GetMapping("/{id}/delete/")
-    public String deleteToDo(@PathVariable long id) {
-        toDoService.deleteToDo(id);
+    public String deleteToDo(@PathVariable int id) {
+        toDoRepository.deleteById(id);
         return "redirect:/todos/";
     }
 
     @GetMapping("{id}/update/")
-    public String showUpdateToDoPage(@PathVariable long id, ModelMap model) {
-        ToDo toDo = toDoService.findById(id);
-        if (toDo == null) {
+    public String showUpdateToDoPage(@PathVariable int id, ModelMap model) {
+        Optional<ToDo> optionalDbToDo = toDoRepository.findById(id);
+        if (optionalDbToDo.isEmpty()) {
             return "redirect:/todos/";
         }
-        model.put("toDo", toDo);
+        model.put("toDo", optionalDbToDo.get());
         model.put("dateFormat", dateFormat);
-        System.out.println(toDo);
         return "addTodo";
     }
 
     @PostMapping("{id}/update/")
-    public String updateToDo(@PathVariable long id, ModelMap model, @Valid ToDo toDo, BindingResult bindingResult) {
+    public String updateToDo(@PathVariable int id, ModelMap model, @Valid ToDo toDo, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "addTodo";
         }
-        ToDo dbToDo = toDoService.findById(id);
-        dbToDo.setDescription(toDo.getDescription());
-        dbToDo.setTargetDate(toDo.getTargetDate());
+        System.out.println(String.format("Id: %d", id));
+
+        Optional<ToDo> optionalDbToDo = toDoRepository.findById(id);
+        System.out.println(optionalDbToDo);
+        if (optionalDbToDo.isPresent()) {
+            ToDo dbToDo = optionalDbToDo.get();
+            dbToDo.setDescription(toDo.getDescription());
+            dbToDo.setTargetDate(toDo.getTargetDate());
+            toDoRepository.save(dbToDo);
+        }
         return "redirect:/todos/";
+    }
+
+    private String getUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 }

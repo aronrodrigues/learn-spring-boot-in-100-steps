@@ -12,30 +12,31 @@ public class ToDoService {
     private static final List<ToDo> todos = new ArrayList<>();
     private static int nextId = 0;
 
-
     static {
-        todos.add(new ToDo(0, "aron", "Learn Docker", LocalDate.now().plusYears(1), false));
-        todos.add(new ToDo(1, "aron", "Learn Cassandra", LocalDate.now().plusYears(2), false));
-        todos.add(new ToDo(2, "aron", "Learn Kubernetes", LocalDate.now().plusYears(3), false));
+        todos.add(new ToDo(0, "aronrodrigues", "Learn Docker", LocalDate.now().plusYears(1), false));
+        todos.add(new ToDo(1, "aronrodrigues", "Learn Cassandra", LocalDate.now().plusYears(2), false));
+        todos.add(new ToDo(2, "aronrodrigues", "Learn Kubernetes", LocalDate.now().plusYears(3), false));
         nextId = todos.get(todos.size() - 1).getId() + 1;
     }
 
     public List<ToDo> findByUsername(String username) {
         return todos.stream().filter(todo -> todo.getUsername().equals(username)).toList();
     }
-    
+
     public ToDo findById(long id) {
         return todos.stream().filter(todo -> todo.getId() == id).findFirst().orElse(null);
     }
 
     public ToDo createToDo(String username, String description) {
         ToDo todo = new ToDo(
-            nextId++, 
-            username, 
-            description, 
-            LocalDate.now().plusYears(1), 
-            false);
+                nextId++,
+                username,
+                description,
+                LocalDate.now().plusYears(1),
+                false);
         todos.add(todo);
+        System.out.println(todo);
+        System.out.println(todos);
         return todo;
     }
 

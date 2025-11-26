@@ -1,6 +1,6 @@
 https://github.com/packtpublishing/learn-spring-boot-in-100-steps---beginner-to-expert
 https://www.coursera.org/learn/packt-spring-boot-foundations-lutga/home/module/1
-
+https://github.com/in28minutes/spring-boot-master-class/blob/master/02.Spring-Boot-Web-Application-V2/99-step-by-step-changes.md
 
 ### New project
 * https://start.spring.io
@@ -98,3 +98,29 @@ https://central.sonatype.com/artifact/javax.servlet/jstl
   <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
   <form:form method="post" modelAttribute="toDo">
     <form:input type="text" name="description" path="description">
+
+
+# JPA
+* implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+* @Entity Map bean to Database
+* @Id and @Generate 
+* src/main/resources/data.sql // Init script
+* application.properties: spring.jpa.defer-datasource-initialization=true
+* H2: In Memory database
+  * runtimeOnly 'com.h2database:h2'
+  * http://localhost:8080/h2-console
+  * spring.datasource.url=jdbc:h2:mem:testdb (updates random default)
+
+# Spring JPA
+* 
+
+# Spring security
+
+* Default
+  * All URLs are protected
+  * Login for unauthorized request
+  * CSRF
+* interface SecureFilterChain
+  * defines a chain matched against every request
+
+
